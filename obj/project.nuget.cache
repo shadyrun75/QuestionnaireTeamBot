@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "lYMVv8IkI2RqeqcpHr/xt1JgqQM3pOrm/MuV7gYuSqdaOupQLnVafasrqOPPdKsk8l8HO2Y0lW41p3GyhZHjeA==",
+  "dgSpecHash": "/EYVZwr91/uniGAUNDMeSnZS84QGyzbyFgqPDc+uFDUY6vMQam8ulr7kf/8Ma+x1sU/D6TwrqVeGWvlajBdlcQ==",
   "success": true,
-  "projectFilePath": "C:\\ShaDy\\Projects\\Other\\questionnaireteambot\\questionnaireteambot.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\ShaDy\\Projects\\GitHub\\QuestionnaireTeamBot\\questionnaireteambot.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\1\\.nuget\\packages\\newtonsoft.json\\12.0.2\\newtonsoft.json.12.0.2.nupkg.sha512",
+    "C:\\Users\\1\\.nuget\\packages\\system.threading.channels\\6.0.0\\system.threading.channels.6.0.0.nupkg.sha512",
+    "C:\\Users\\1\\.nuget\\packages\\telegram.bot\\17.0.0\\telegram.bot.17.0.0.nupkg.sha512",
+    "C:\\Users\\1\\.nuget\\packages\\telegram.bot.extensions.polling\\1.0.2\\telegram.bot.extensions.polling.1.0.2.nupkg.sha512"
+  ],
   "logs": []
 }

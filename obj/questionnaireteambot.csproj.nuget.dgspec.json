@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\ShaDy\\Projects\\Other\\questionnaireteambot\\questionnaireteambot.csproj": {}
+    "C:\\ShaDy\\Projects\\GitHub\\QuestionnaireTeamBot\\questionnaireteambot.csproj": {}
   },
   "projects": {
-    "C:\\ShaDy\\Projects\\Other\\questionnaireteambot\\questionnaireteambot.csproj": {
+    "C:\\ShaDy\\Projects\\GitHub\\QuestionnaireTeamBot\\questionnaireteambot.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\ShaDy\\Projects\\Other\\questionnaireteambot\\questionnaireteambot.csproj",
+        "projectUniqueName": "C:\\ShaDy\\Projects\\GitHub\\QuestionnaireTeamBot\\questionnaireteambot.csproj",
         "projectName": "questionnaireteambot",
-        "projectPath": "C:\\ShaDy\\Projects\\Other\\questionnaireteambot\\questionnaireteambot.csproj",
+        "projectPath": "C:\\ShaDy\\Projects\\GitHub\\QuestionnaireTeamBot\\questionnaireteambot.csproj",
         "packagesPath": "C:\\Users\\1\\.nuget\\packages\\",
-        "outputPath": "C:\\ShaDy\\Projects\\Other\\questionnaireteambot\\obj\\",
+        "outputPath": "C:\\ShaDy\\Projects\\GitHub\\QuestionnaireTeamBot\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -43,6 +43,16 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
+          "dependencies": {
+            "Telegram.Bot": {
+              "target": "Package",
+              "version": "[17.0.0, )"
+            },
+            "Telegram.Bot.Extensions.Polling": {
+              "target": "Package",
+              "version": "[1.0.2, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
