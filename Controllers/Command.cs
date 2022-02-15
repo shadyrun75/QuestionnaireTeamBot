@@ -3,7 +3,7 @@ namespace QuestionnaireTeamBot.Controllers
     /// <summary>
     /// Controller for determining command by message
     /// </summary>
-    public static class CommandController
+    public static class Command
     {
         /// <summary>
         /// Method for determining command object by string message

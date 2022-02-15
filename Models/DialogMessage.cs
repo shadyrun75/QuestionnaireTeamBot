@@ -5,25 +5,7 @@ namespace QuestionnaireTeamBot.Models
     /// </summary>
     public class DialogMessage
     {
-        /// <summary>
-        /// Вопрос от бота
-        /// </summary>
-        public Message Question { get; private set; } = new Message();
-        /// <summary>
-        /// Ответ от пользователя
-        /// </summary>
-        public Message Answer { get; private set; } = new Message();
-
-        public DialogMessage(string question)
-        {
-            Question.Data = question;
-        }
-
-        public string GetQuestion()
-        {
-            Question.Date = DateTime.Now;
-            return Question.Data;
-        }
-
+        public Message? Question { get; set; }
+        public Message? Answer { get; set; }
     }
 }

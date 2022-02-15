@@ -8,7 +8,7 @@ namespace QuestionnaireTeamBot.Controllers
 {
     public class Listener
     {
-        MainController commandController = new MainController();
+        Main commandController = new Main();
         public async void Lisen(string botKey)
         {
             var botClient = new TelegramBotClient(botKey);

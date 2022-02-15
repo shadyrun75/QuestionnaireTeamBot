@@ -1,37 +1,75 @@
+using QuestionnaireTeamBot.Interfaces;
+
 namespace QuestionnaireTeamBot.Models
 {
     public class Dialog
     {
-        private List<DialogMessage> dialogMessages = new List<DialogMessage>();
-        private int currentQuestion = 0;
-        private DialogMessage CurrentDialog => dialogMessages[currentQuestion];
-        public Enums.TypeCommand Type { get; private set; }
-        public bool IsFinished { get; private set; } = false;
-        public DialogMessage[] History => dialogMessages.ToArray();
 
-        public Dialog(Enums.TypeCommand typeQuestion, string[] questions)
+        public User User { get; private set; }
+        public DialogQuestions Questions { get; private set; }
+
+        public List<DialogMessage> Messages { get; private set; }
+        public Enums.TypeDialog Type => Questions.TypeDialog;
+
+        public IDialogController Controller { get; private set; }
+        public bool IsFinished => Questions.Questions.Length == Messages.Count(x => x.Answer != null);
+        public Dialog(User user, DialogQuestions questions, IDialogController controller)
         {
-            if (questions.Length == 0)
-                throw new Exception("Список вопросов не может быть пустым. Инициализация диалога невозможна.");
+            User = user;
+            Questions = questions;
+            Controller = controller;
+            Messages = new List<DialogMessage>();
+        }
 
-            Type = typeQuestion;
+        public Dialog(User user, DialogQuestions questions, IDialogController controller, IEnumerable<DialogMessage> messages)
+        {
+            User = user;
+            Questions = questions;
+            Controller = controller;
+            Messages = messages.ToList();
+        }
 
-            foreach (var item in questions)
+        public string GetQuestion(string? inputMessage = null)
+        {
+            var index = GetLastQuestionIndex();
+            var question = Controller.PrepareQuestion(User, Questions.Questions[index], index, inputMessage);
+
+            if (Messages.Count == index)
+                Messages.Add(new DialogMessage()
+                {
+                    Question = new Message()
+                });
+            Messages[index].Question.Data = question;
+            Messages[index].Question.Date = DateTime.Now;
+
+            return question;
+        }
+
+        public string SetAnswer(string inputMessage)
+        {
+            var index = GetLastQuestionIndex();
+            try
             {
-                dialogMessages.Add(new DialogMessage(item));
+                var answer = Controller.PrepareAnswer(User, inputMessage, index);
+                Messages[index].Answer = new Message()
+                {
+                    Data = inputMessage,
+                    Date = DateTime.Now
+                };
+                return answer;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
         }
 
-        public string GetQuestion() => CurrentDialog.GetQuestion();
-        public void AddAnswer(string value)
+        private int GetLastQuestionIndex()
         {
-            CurrentDialog.Answer.Data = value;
-            if (currentQuestion == dialogMessages.Count - 1)
-            {
-                IsFinished = true;
-                return;
-            }
-            currentQuestion++;
+            int index = Messages.Count(x => x.Answer != null);
+            if (index == Questions.Questions.Length)
+                index--;
+            return index;
         }
     }
 }

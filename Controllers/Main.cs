@@ -2,9 +2,9 @@ using Telegram.Bot.Types;
 
 namespace QuestionnaireTeamBot.Controllers
 {
-    public class MainController
+    public class Main
     {
-        Users users = new Users();
+        List<Discussion> discussions = new List<Discussion>();
 
         public IEnumerable<string> GetAnswer(Update update)
         {
@@ -15,11 +15,11 @@ namespace QuestionnaireTeamBot.Controllers
 
                 long chatId = update?.Message?.Chat.Id ?? 0;
                 var messageText = update?.Message?.Text ?? "";
-
-                if (!users.Contains(chatId))
+                var dis = discussions.FirstOrDefault(x => x.User.Id == chatId);
+                if (dis == null)
                     return UnregisteredChat(messageText, update);
 
-                return users.Get(chatId).GetAnswer(messageText);
+                return dis.Talk(messageText);
             }
             catch (Exception ex)
             {
@@ -32,14 +32,15 @@ namespace QuestionnaireTeamBot.Controllers
             if (update == null)
                 throw new Exception("Update is null");
             List<string> answer = new List<string>();
-            var command = CommandController.GetCommand(messageText);
+            var command = Command.GetCommand(messageText);
             if (command != null)
             {
                 switch (command.Type)
                 {
                     case Enums.TypeCommand.Register:
-                        users.Add(update.Message.Chat);
-                        answer.AddRange(users.Get(update.Message.Chat.Id).GetAnswer(messageText));
+                        var dis = new Discussion(update?.Message?.Chat);
+                        discussions.Add(dis);
+                        answer.AddRange(dis.Talk(messageText));
                         break;
                     case Enums.TypeCommand.Start:
                         answer.Add("Приветствую. Для дальнейшей работы тебе нужно зарегистрироваться. Введи команду <b>/register</b>, а там посмотрим.");
