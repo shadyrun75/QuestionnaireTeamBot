@@ -1,28 +1,31 @@
 using Telegram.Bot.Types;
 
-namespace Bot.Controllers
+namespace QuestionnaireTeamBot.Controllers
 {
     public class Users
     {
-        private List<Bot.Models.User> userList = new List<Models.User>();
+        private List<QuestionnaireTeamBot.Models.User> userList = new List<Models.User>();
         public bool Contains(long chatId)
         {
             return userList.FirstOrDefault(x => x.Id == chatId) == null ? false : true;
         }
 
-        public Bot.Models.User Get(long chatId)
+        public QuestionnaireTeamBot.Models.User Get(long chatId)
         {
-            return userList.FirstOrDefault(x => x.Id == chatId);
+            return userList.FirstOrDefault(x => x.Id == chatId) ?? throw new Exception("Критическая ошибка! Не найден чат!");
         }
 
-
-        public void Add(Chat chat)
+        public void Add(Chat? chat)
         {
+            if (chat == null)
+                throw new Exception("Нельзя добавить в список зарегистрированных пользователей пустой чат.");
             if (!Contains(chat.Id))
                 userList.Add(
                     new Models.User()
                     {
-                        Chat = chat
+                        Id = chat.Id,
+                        Description = $"{chat.LastName} {chat.FirstName}",
+                        UserName = chat.Username
                     }
                 );
         }

@@ -3,16 +3,15 @@ using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Bot.Controllers;
 
-namespace Bot.Controllers
+namespace QuestionnaireTeamBot.Controllers
 {
     public class Listener
     {
-        Command commandController = new Command();
-        public async void Lisen()
+        MainController commandController = new MainController();
+        public async void Lisen(string botKey)
         {
-            var botClient = new TelegramBotClient("5196780296:AAH-M3puDd4ymkEOdtRlZWcpdpxBVLVMfoc");
+            var botClient = new TelegramBotClient(botKey);
 
             using var cts = new CancellationTokenSource();
 
@@ -41,6 +40,7 @@ namespace Bot.Controllers
             Message sentMessage = await botClient.SendTextMessageAsync(
                 chatId: chatId,
                 text: message,
+                parseMode: ParseMode.Html,
                 cancellationToken: cancellationToken);
         }
 
@@ -63,14 +63,12 @@ namespace Bot.Controllers
                 return;
             }
 
-            /*var messageText = update.Message.Text;
-            var temp = $"{update.Message.Chat.FirstName} {update.Message.Chat.LastName}";
-
-            Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
-            await SendTextMessage(botClient, $"{temp} text {messageText}", chatId, cancellationToken);*/
-            var message = commandController.GetAnswer(update);
-            if (message.Length > 0)
-                await SendTextMessage(botClient, message, chatId, cancellationToken);
+            var answers = commandController.GetAnswer(update);
+            foreach (var answer in answers)
+            {
+                if (answer.Length > 0)
+                    await SendTextMessage(botClient, answer, chatId, cancellationToken);
+            }
         }
 
         Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
