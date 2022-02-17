@@ -1,10 +1,24 @@
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace QuestionnaireTeamBot.Controllers
 {
     public class Main
     {
-        List<Discussion> discussions = new List<Discussion>();
+        TelegramBotClient bot;
+        CancellationToken cst;
+        static List<Discussion> discussions = new List<Discussion>();
+        static ActionControllers.DailyReport dailyReportController = null;
+
+        public delegate void SendMessageHandler(ITelegramBotClient botClient, string message, ChatId chatId, CancellationToken cancellationToken);
+        public event SendMessageHandler? OnSendMessage;
+        public Main(TelegramBotClient botClient, CancellationToken cancellationToken)
+        {
+            bot = botClient;
+            cst = cancellationToken;
+            InitializeDiscussion();
+            InitializeControllers();
+        }
 
         public IEnumerable<string> GetAnswer(Update update)
         {
@@ -27,6 +41,11 @@ namespace QuestionnaireTeamBot.Controllers
             }
         }
 
+        private void SendMessage(string message, Models.User user)
+        {
+            OnSendMessage?.Invoke(bot, message, new ChatId(user.Id), cst);
+        }
+
         private IEnumerable<string> UnregisteredChat(string messageText, Update? update)
         {
             if (update == null)
@@ -39,8 +58,9 @@ namespace QuestionnaireTeamBot.Controllers
                 {
                     case Enums.TypeCommand.Register:
                         var dis = new Discussion(update?.Message?.Chat);
-                        discussions.Add(dis);
+                        dis.OnSendMessage += SendMessage;
                         answer.AddRange(dis.Talk(messageText));
+                        discussions.Add(dis);
                         break;
                     case Enums.TypeCommand.Start:
                         answer.Add("Приветствую. Для дальнейшей работы тебе нужно зарегистрироваться. Введи команду <b>/register</b>, а там посмотрим.");
@@ -53,6 +73,27 @@ namespace QuestionnaireTeamBot.Controllers
             else
                 answer.Add("Ты кто? Я тебя не знаю. Зарегистрируйся через команду <b>/register</b>.");
             return answer;
+        }
+
+        private void InitializeDiscussion()
+        {
+            foreach (var user in Database.DBWorker.Users.GetUsers())
+            {
+                var temp = new Discussion(user);
+                temp.OnSendMessage += SendMessage;
+                discussions.Add(temp);
+            }
+        }
+
+        private void InitializeControllers()
+        {
+            InitializeDailyReport();
+        }
+
+        private void InitializeDailyReport()
+        {
+            dailyReportController = new ActionControllers.DailyReport(discussions);
+            dailyReportController.Load(Database.DBWorker.DailyReport.LoadDailyReportsUsers(dailyReportController.DateReport));
         }
     }
 }

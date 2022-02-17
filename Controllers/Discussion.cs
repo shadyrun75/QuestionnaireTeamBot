@@ -6,9 +6,10 @@ namespace QuestionnaireTeamBot.Controllers
     public class Discussion
     {
         public Models.User User { get; private set; }
-        public Models.Dialog CurrentDialog { get; set; } = null;
+        public Models.Dialog? CurrentDialog { get; set; }
         public List<Models.Dialog> DialogHistory { get; private set; } = new List<Models.Dialog>();
-
+        public delegate void SendMessageHandler(string message, Models.User user);
+        public event SendMessageHandler? OnSendMessage;
         public Discussion(Models.User user)
         {
             User = user;
@@ -25,7 +26,7 @@ namespace QuestionnaireTeamBot.Controllers
             };
         }
 
-        public IEnumerable<string> Talk(string messageText)
+        public IEnumerable<string> Talk(string messageText, bool botInitiator = false)
         {
             List<string> answer = new List<string>();
 
@@ -34,6 +35,13 @@ namespace QuestionnaireTeamBot.Controllers
                 answer.AddRange(MessageIsNotCommand(messageText));
             else
                 answer.AddRange(MessageIsCommand(command, messageText));
+
+            if (botInitiator)
+            {
+                foreach (var item in answer)
+                    OnSendMessage?.Invoke(item, User);
+                return answer;
+            }
 
             return answer;
         }
@@ -47,14 +55,18 @@ namespace QuestionnaireTeamBot.Controllers
                 if (!CurrentDialog.IsFinished)
                     answer.Add(CurrentDialog.GetQuestion());
                 else
-                {
-                    DialogHistory.Add(CurrentDialog);
-                    CurrentDialog = null;
-                }
+                    AddInHistoryCurrentDialog();
             }
             else
                 answer.Add($"Нет текущего диалога. Отправь команду или дождись вопроса.");
             return answer;
+        }
+
+        private void AddInHistoryCurrentDialog()
+        {
+            if (CurrentDialog != null)
+                DialogHistory.Add(CurrentDialog);
+            CurrentDialog = null;
         }
 
         private IEnumerable<string> MessageIsCommand(Models.Command command, string messageText)
@@ -63,6 +75,8 @@ namespace QuestionnaireTeamBot.Controllers
             switch (command.Type)
             {
                 case Enums.TypeCommand.Register:
+                    CurrentDialog = new Dialog(User, Enums.TypeDialog.Register, new Controllers.DialogControllers.Register());
+                    answer.Add(CurrentDialog.GetQuestion(command.Data));
                     break;
                 case Enums.TypeCommand.Clean:
                     foreach (var item in DialogHistory)
@@ -79,6 +93,16 @@ namespace QuestionnaireTeamBot.Controllers
                 case Enums.TypeCommand.DailyReport:
                     CurrentDialog = new Dialog(User, Data.Dialogs.DailyReport, new Controllers.DialogControllers.DailyReport());
                     answer.Add(CurrentDialog.GetQuestion(command.Data));
+                    break;
+                case Enums.TypeCommand.SetEveningTime:
+                    CurrentDialog = new Dialog(User, Enums.TypeDialog.SetEveningTime, new Controllers.DialogControllers.SetEveningTime());
+                    answer.Add(CurrentDialog.GetQuestion(command.Data));
+                    AddInHistoryCurrentDialog();
+                    break;
+                case Enums.TypeCommand.SetMorningTime:
+                    CurrentDialog = new Dialog(User, Enums.TypeDialog.SetMorningTime, new Controllers.DialogControllers.SetMorningTime());
+                    answer.Add(CurrentDialog.GetQuestion(command.Data));
+                    AddInHistoryCurrentDialog();
                     break;
             }
             return answer;

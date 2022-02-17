@@ -18,13 +18,15 @@ namespace QuestionnaireTeamBot.Controllers.DialogControllers
         {
             switch (index)
             {
-                case 1: return "Спасибо за ответ";
+                case 1: return "Отчет получен";
                 default: return "";
             }
         }
 
-        public string PrepareQuestion(User user, Question question, int index, string? command)
+        public string PrepareQuestion(User user, Question? question, int index, string? command)
         {
+            if (question == null)
+                throw new Exception("Пустой вопрос в DailyReport!");
             switch (index)
             {
                 case 0: return OnGetQuestionWhatYouDo(user, question.Text);
@@ -32,5 +34,7 @@ namespace QuestionnaireTeamBot.Controllers.DialogControllers
             }
             return "Не удалось обработать вопрос";
         }
+
+
     }
 }

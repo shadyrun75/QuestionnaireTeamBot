@@ -8,10 +8,10 @@ namespace QuestionnaireTeamBot.Controllers
 {
     public class Listener
     {
-        Main commandController = new Main();
-        public async void Lisen(string botKey)
+        Main mainController = null;
+        public async void Lisen()
         {
-            var botClient = new TelegramBotClient(botKey);
+            var botClient = new TelegramBotClient(Config.Settings?.TelegramBotKey ?? "");
 
             using var cts = new CancellationTokenSource();
 
@@ -29,14 +29,21 @@ namespace QuestionnaireTeamBot.Controllers
 
             var me = await botClient.GetMeAsync();
 
+            mainController = new Main(botClient, cts.Token);
+            mainController.OnSendMessage += SendTextMessage;
+
             Console.WriteLine($"Start listening for @{me.Username}");
             Console.ReadLine();
             cts.Cancel();
         }
 
-        async Task SendTextMessage(ITelegramBotClient botClient, string message, ChatId chatId, CancellationToken cancellationToken)
+        void SendTextMessage(ITelegramBotClient botClient, string message, ChatId chatId, CancellationToken cancellationToken)
         {
-            // Echo received message text
+            Task task = SendTextMessageAsync(botClient, message, chatId, cancellationToken);
+        }
+
+        async Task SendTextMessageAsync(ITelegramBotClient botClient, string message, ChatId chatId, CancellationToken cancellationToken)
+        {
             Message sentMessage = await botClient.SendTextMessageAsync(
                 chatId: chatId,
                 text: message,
@@ -53,21 +60,21 @@ namespace QuestionnaireTeamBot.Controllers
 
             if (update.Type != UpdateType.Message)
             {
-                await SendTextMessage(botClient, "Usuported update type", chatId, cancellationToken);
+                await SendTextMessageAsync(botClient, "Usuported update type", chatId, cancellationToken);
                 return;
             }
 
             if (update.Message!.Type != MessageType.Text)
             {
-                await SendTextMessage(botClient, "Usuported message type", chatId, cancellationToken);
+                await SendTextMessageAsync(botClient, "Usuported message type", chatId, cancellationToken);
                 return;
             }
 
-            var answers = commandController.GetAnswer(update);
+            var answers = mainController.GetAnswer(update);
             foreach (var answer in answers)
             {
                 if (answer.Length > 0)
-                    await SendTextMessage(botClient, answer, chatId, cancellationToken);
+                    await SendTextMessageAsync(botClient, answer, chatId, cancellationToken);
             }
         }
 

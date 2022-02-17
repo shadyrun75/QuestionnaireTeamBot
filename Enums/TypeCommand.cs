@@ -5,6 +5,8 @@ namespace QuestionnaireTeamBot.Enums
         Start,
         Register,
         Clean,
-        DailyReport
+        DailyReport,
+        SetEveningTime,
+        SetMorningTime
     }
 }

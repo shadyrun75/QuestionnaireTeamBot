@@ -38,6 +38,12 @@ namespace QuestionnaireTeamBot.Controllers
                     case "/dailyreport":
                         command.Type = Enums.TypeCommand.DailyReport;
                         break;
+                    case "/seteveningtime":
+                        command.Type = Enums.TypeCommand.SetEveningTime;
+                        break;
+                    case "/setmorningtime":
+                        command.Type = Enums.TypeCommand.SetMorningTime;
+                        break;
                     default:
                         throw new Exception("Неизвестная команда");
                 }

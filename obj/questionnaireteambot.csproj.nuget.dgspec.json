@@ -51,6 +51,10 @@
             "Telegram.Bot.Extensions.Polling": {
               "target": "Package",
               "version": "[1.0.2, )"
+            },
+            "npgsql": {
+              "target": "Package",
+              "version": "[6.0.3, )"
             }
           },
           "imports": [
